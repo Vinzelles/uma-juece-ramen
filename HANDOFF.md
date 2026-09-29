@@ -44,6 +44,8 @@
 
 本次交接提交前另行复核：16 项 Python 测试通过；引擎锁定的 178 个文件与受检源码一致；采集补丁在独立基线检出中完成检查、应用和 10 个文件的哈希核对。`python scripts/build_android.py --skip-prepare` 再次成功，原生构建、数据及 ELF/ZIP 16 KB 校验通过；Java 测试任务复用未改变输入的 Gradle 缓存。此次本地 APK 的 SHA256 为 `75a3875fb95dcba5c4ba6457047e575c0a315dce011130b62391587f702cd43a`，它仍是提交前开发产物，分支 CI 会生成带实际提交标识的新产物。
 
+创建 PR 前复查发现，[首次远端 CI](https://github.com/Vinzelles/uma-juece-ramen/actions/runs/36573785405) 在 SDK 初始化阶段失败：`sdkmanager` 找不到旧 `tools` 包，后续项目测试均未执行。工作流已显式只安装 `platform-tools`，固定版本 SDK/NDK 的安装与全部测试步骤保持启用；修正后的结果以分支最新 Actions 为准，不能把首次失败记录算作构建通过。
+
 ## 3. 作者先完成可复现构建
 
 从一个独立目录检出交接分支：

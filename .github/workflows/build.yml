@@ -25,6 +25,9 @@ jobs:
           java-version: '17.0.16+8'
       - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v3
+        with:
+          # The legacy 'tools' package is no longer available from sdkmanager.
+          packages: platform-tools
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: '1.97.1'
