@@ -43,6 +43,29 @@ jobs:
           "$SDKM" --install 'platforms;android-34' 'build-tools;35.0.0' 'ndk;28.2.13676358'
           ls "$ANDROID_HOME/ndk/"
           test -d "$ANDROID_HOME/ndk/28.2.13676358"
+          # #386 复盘：NDK 目录在、ls 能列出，但 build_android.py 仍报找不到——
+          # 把 ANDROID_NDK_HOME 持久化到后续步骤（GITHUB_ENV），排除环境传递差异
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+      - name: NDK 自证（探测三要素：路径/目录/source.properties）
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_NDK_HOME=${ANDROID_NDK_HOME:-<未设>}"
+          ls "$ANDROID_HOME/ndk/" || true
+          cat "$ANDROID_HOME/ndk/28.2.13676358/source.properties" 2>/dev/null || echo "source.properties 不在"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          sdk = os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT")
+          ndk = Path(os.environ.get("ANDROID_NDK_HOME", str(Path(sdk) / "ndk" / "28.2.13676358") if sdk else ""))
+          print("ndk path =", ndk)
+          print("is_dir =", ndk.is_dir())
+          p = ndk / "source.properties"
+          print("props exists =", p.exists())
+          if p.exists():
+              t = p.read_text()
+              print("props head =", repr(t[:200]))
+              print("version in props =", "28.2.13676358" in t)
+          PY
       - name: Install pinned cargo-ndk
         run: cargo install cargo-ndk --version 4.1.2 --locked
       - name: Validate wrapper and packaging regression tests
