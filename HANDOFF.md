@@ -2,6 +2,8 @@
 
 交接日期：2026-09-29。分支：`workbench/android-runtime-handoff-20260929`。
 
+交付仓库：[Vinzelles/uma-juece-ramen](https://github.com/Vinzelles/uma-juece-ramen/tree/workbench/android-runtime-handoff-20260929)。原仓库 `xf8410/uma-juece-ramen` 对当前账号仅开放读取，直接推送返回 403，因此使用同源 fork 交付。作者可从该分支取回改动。
+
 **当前交付是可构建、已做桌面回归的开发版本。真实完整采集尚未接通，也没有真机验收结论。** 本次开发方没有测试设备，后续由仓库作者在目标游戏环境验证。
 
 最重要的未完成项是采集端：`from_legacy_summary` 仍明确输出 `run_id=null`、`stage=unknown`、`capture_coherence=unverified` 和空 `continuation`。安装 APK 或替换为本次编译的 SO，都不会自动补齐这些字段。接手后应先实现可靠的完整快照，再验证真实推荐。
@@ -47,7 +49,7 @@
 从一个独立目录检出交接分支：
 
 ```powershell
-git clone --branch workbench/android-runtime-handoff-20260929 https://github.com/xf8410/uma-juece-ramen.git
+git clone --branch workbench/android-runtime-handoff-20260929 https://github.com/Vinzelles/uma-juece-ramen.git
 cd uma-juece-ramen
 python scripts/prepare_engine.py --package-data
 ```
@@ -68,7 +70,7 @@ python scripts/build_android.py --skip-prepare
 
 预期输出：`app/build/outputs/apk/debug/app-debug.apk`，包名 `com.umaai.assistant.dev`，版本 `0.5.0-dev-debug`。它可与旧正式包并存。首次运行按界面授予浮窗和通知权限。
 
-推送会匹配 `workbench/*` 的构建 workflow。CI 成功只代表该 workflow 覆盖的构建与测试通过，不代表真机验收通过。自动发版和自动策略提交已退出生产流水线。
+该分支匹配 `workbench/*` 的构建 workflow。新 fork 可能尚未启用 Actions，需先在仓库 Actions 页面确认并启用，再手动触发构建；作者也可将分支迁入原仓库运行。CI 成功只代表该 workflow 覆盖的构建与测试通过，不代表真机验收通过。自动发版和自动策略提交已退出生产流水线。
 
 ## 4. 取得采集端改动
 
