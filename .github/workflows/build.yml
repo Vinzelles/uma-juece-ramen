@@ -33,7 +33,16 @@ jobs:
           toolchain: '1.97.1'
           targets: aarch64-linux-android
       - name: Install pinned Android tools
-        run: sdkmanager 'platforms;android-34' 'build-tools;35.0.0' 'ndk;28.2.13676358'
+        # #385 复盘：裸 sdkmanager 在 runner 上 2 秒静默退出（无任何安装输出），
+        # NDK 没落地，build_android.py 才报"Install NDK"。改显式 --install +
+        # 刚下载的 cmdline-tools 绝对路径 + 装完自证，装不上当步就红。
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          if [ ! -x "$SDKM" ]; then SDKM="$(command -v sdkmanager)"; fi
+          echo "using sdkmanager: $SDKM"
+          "$SDKM" --install 'platforms;android-34' 'build-tools;35.0.0' 'ndk;28.2.13676358'
+          ls "$ANDROID_HOME/ndk/"
+          test -d "$ANDROID_HOME/ndk/28.2.13676358"
       - name: Install pinned cargo-ndk
         run: cargo install cargo-ndk --version 4.1.2 --locked
       - name: Validate wrapper and packaging regression tests
